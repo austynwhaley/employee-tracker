@@ -1,5 +1,4 @@
 // Dependencies
-var express = require("express");
 var mysql = require("mysql");
 const cTable = require('console.table');
 const inquirer = require("inquirer");
@@ -19,11 +18,11 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as Id" + connection.threadId)
-    startingPrompt();
+    beginningPrompt();
 });
   
 
-function startingPrompt() {
+function beginningPrompt() {
     inquirer.prompt({
         name: "startMenu",
         type: 'list',
@@ -79,31 +78,37 @@ function viewAllEmployees() {
     function(err, res) {
       if (err) throw err
       console.table(res)
-      startingPrompt()
+      beginningPrompt()
   })
     
 };
 
 
 function viewAllRoles() {
-    connection.query('SELECT * FROM role', 
+    connection.query('SELECT * FROM role;', 
     function(err, res) {
     if (err) throw err
     console.table(res)
-    startingPrompt()
+    beginningPrompt()
     })
 }
 
 function viewAllDepartments() {
-    connection.query('SELECT * FROM department', 
+    connection.query('SELECT * FROM department;', 
     function(err, res) {
       if (err) throw err
       console.table(res)
-      startingPrompt()
+      beginningPrompt()
     })
 }
 
 function updateEmployee() {
+    connection.query("SELECT id, CONCAT (first_name, '', last_name) AS name FROM employee;",
+    function(err, res) {
+        if (err) throw err
+
+        console.log(res)
+    })
 
 };
 
@@ -139,6 +144,58 @@ function addDepartment() {
 
 };
 
-function addRole() {
+function addRole() { 
+    connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role",   
+    function(err, res) {
+      inquirer.prompt([
+        {
+            name: "title",
+            type: "input",
+            message: "What is the roles title?"
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "What is the salary for the role?"
+  
+        },
+        {
+            name: "department",
+            type: "list",
+            message: "Select the role's department id",
+            choices: selectDepartment()
+        }
+        
+      ]).then(function(res) {
+          connection.query("INSERT INTO role SET ?",
 
+            {
+                title: res.title,
+                salary: res.salary,
+                department_id: res.department
+            },
+
+            function(err) {
+                if (err) throw err
+                console.table(res);
+                beginningPrompt();
+            }
+        )
+  
+      });
+
+    });
 };
+
+var departmentArr = [''];
+function selectDepartment() {
+  connection.query("SELECT * FROM department", function(err, res) {
+    if (err) throw err
+    for (var i = 0; i < res.length; i++) {
+      departmentArr.push(res[i].id);
+    }
+    
+  })
+
+  return departmentArr;
+}
