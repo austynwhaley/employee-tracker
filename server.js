@@ -18,8 +18,9 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
     if (err) throw err;
+    console.log("connected as Id" + connection.threadId)
     startingPrompt();
-  });
+});
   
 
 function startingPrompt() {
@@ -29,25 +30,26 @@ function startingPrompt() {
         message: "What would you like to do?",
         choices: [
 
-        "View All Employees?", 
-        "View All Employee's By Roles?",
-        "View all Emplyees By Deparments", 
-        "Update Employee",
-        "Add Employee?",
-        "Add Role?",
-        "Add Department?"]
+        "View all employees?", 
+        "View all employee's by role?",
+        "View all employee's by department?", 
+        "Update employee",
+        "Add employee?",
+        "Add role?",
+        "Add department?"]
     })
-    .then((answer) => {
-        switch(answer.action) {
+    .then( function (answer) {
+        switch(answer.startMenu) {
+
             case "View all employees?":
                 viewAllEmployees()
             break;
 
-            case "View all employees by role?":
+            case "View all employee's by role?":
                 viewAllRoles() 
             break;
 
-            case "View all employees by department?":
+            case "View all employee's by department?":
                 viewAllDepartments() 
             break;
 
@@ -73,21 +75,33 @@ function startingPrompt() {
   
 function viewAllEmployees() {
 
-    inquirer.prompt({
-
-
-    });
+    connection.query('SELECT * FROM employee', 
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      startingPrompt()
+  })
     
 };
 
 
 function viewAllRoles() {
-
-};
+    connection.query('SELECT * FROM role', 
+    function(err, res) {
+    if (err) throw err
+    console.table(res)
+    startingPrompt()
+    })
+}
 
 function viewAllDepartments() {
-
-};
+    connection.query('SELECT * FROM department', 
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      startingPrompt()
+    })
+}
 
 function updateEmployee() {
 
