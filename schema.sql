@@ -50,7 +50,7 @@ INSERT INTO role (title, salary, department_id)
 VALUE ("Running back", 25000000, 1);
 
 INSERT INTO role (title, salary, department_id) 
-VALUE ("Long Snapper", 4000000, 3);
+VALUE ("Punter", 1200000, 3);
 
 INSERT INTO role (title, salary, department_id) 
 VALUE ("Head Coach", 7000000, 4);
@@ -66,7 +66,7 @@ VALUE ("Lineman", 2500000, 2);
 
 
 INSERT INTO role (title, salary, department_id) 
-VALUE ("Kicker", 1000000, 3);
+VALUE ("Kicker", 1500000, 3);
 
 
 

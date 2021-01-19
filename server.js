@@ -80,40 +80,29 @@ function beginningPrompt() {
 function viewAllEmployees() {
 
     connection.query('SELECT * FROM employee', 
-    function(err, res) {
-      if (err) throw err
-      console.table(res)
-      beginningPrompt()
-  })   
+
+    function(err, res) { if (err) throw err; console.table(res); beginningPrompt() })  
 };
 
 
 function viewAllRoles() {
     connection.query('SELECT * FROM role;', 
-    function(err, res) {
-    if (err) throw err
-    console.table(res)
-    beginningPrompt()
-    })
+
+    function(err, res) { if (err) throw err; console.table(res); beginningPrompt() })
 };
 
 function viewAllDepartments() {
     connection.query('SELECT * FROM department;', 
-    function(err, res) {
-      if (err) throw err
-      console.table(res)
-      beginningPrompt()
-    })
+
+    function(err, res) { if (err) throw err; console.table(res); beginningPrompt() })
 };
 
 function updateEmployee() {
     connection.query("SELECT id, CONCAT (first_name, '', last_name) AS name FROM employee;",
-    function(err, res) {
-        if (err) throw err
 
-        console.log(res)
-    })
+    function(err, res) { if (err) throw err; console.table(res); beginningPrompt() })
 };
+
 
 function addEmployee() {
     inquirer.prompt(
@@ -131,15 +120,28 @@ function addEmployee() {
         name:"role",
         type:"list",
         message:"What is the employee's role?",
-        choices:["Offense", "Defence","Special Teams","Coaching"]
+        choices:selectRole()
     },
     {
         name:"manager",
         type:"list",
         message:"Who is the employee's manager?",
-        choices:[]
+        choices: selectManager()
     }
-    );
+    ).then(function(res) {
+        
+        connection.query("INSERT INTO role SET ?",
+
+      {
+        first_name: res.firstName,
+        last_name: res.lastName,
+        manager_id: res.manager,
+        role_id: res.role
+      },
+
+      function(err) { if (err) throw err; console.table(res); beginningPrompt(); })
+
+    });
 };
 
 function addDepartment() { 
@@ -180,7 +182,7 @@ function addRole() {
             name: "department",
             type: "list",
             message: "Select the role's department id",
-            choices: selectDepartment()
+            choices: selectDepartmentId()
         },
         
       ]).then(function(res) {
@@ -193,15 +195,34 @@ function addRole() {
         },
 
         function(err) { if (err) throw err; console.table(res); beginningPrompt(); })
+        
         });
     });
 };
 
-var departmentArr = [''];
-function selectDepartment() {
+var department = [''];
+function selectDepartmentId() {
   connection.query("SELECT * FROM department", function(err, res) {
-    if (err) throw err
-    for (var i = 0; i < res.length; i++) { departmentArr.push(res[i].id); }});
 
-  return departmentArr;
+    if (err) throw err; for (var i = 0; i < res.length; i++) { department.push(res[i].id); }});
+
+  return departmentId;
+}
+
+var manager = [];
+function selectManager() {
+  connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
+
+    if (err) throw err; for (var i = 0; i < res.length; i++) {manager.push(res[i].first_name);}})
+
+    return manager;
+}
+
+var role = [];
+function selectRole() {
+  connection.query("SELECT * FROM role", function(err, res) {
+
+    if (err) throw err; for (var i = 0; i < res.length; i++) {role.push(res[i].title);}})
+
+    return role;
 }
