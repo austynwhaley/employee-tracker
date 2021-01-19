@@ -24,7 +24,7 @@ connection.connect(function(err) {
 
 function beginningPrompt() {
 
-    console.log('▁ ▂ ▄ ▅ ▆ ▇ █Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
+    console.log('▁ ▂ ▄ ▅ ▆ ▇ █！！Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
 
     inquirer.prompt({
 
