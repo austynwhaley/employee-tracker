@@ -23,7 +23,11 @@ connection.connect(function(err) {
   
 
 function beginningPrompt() {
+
+    console.log('▁ ▂ ▄ ▅ ▆ ▇ █Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
+
     inquirer.prompt({
+
         name: "startMenu",
         type: 'list',
         message: "What would you like to do?",
@@ -35,8 +39,9 @@ function beginningPrompt() {
         "Update employee",
         "Add employee?",
         "Add role?",
-        "Add department?"]
-    })
+        "Add department?"
+    ]})
+
     .then( function (answer) {
         switch(answer.startMenu) {
 
@@ -79,8 +84,7 @@ function viewAllEmployees() {
       if (err) throw err
       console.table(res)
       beginningPrompt()
-  })
-    
+  })   
 };
 
 
@@ -91,7 +95,7 @@ function viewAllRoles() {
     console.table(res)
     beginningPrompt()
     })
-}
+};
 
 function viewAllDepartments() {
     connection.query('SELECT * FROM department;', 
@@ -100,7 +104,7 @@ function viewAllDepartments() {
       console.table(res)
       beginningPrompt()
     })
-}
+};
 
 function updateEmployee() {
     connection.query("SELECT id, CONCAT (first_name, '', last_name) AS name FROM employee;",
@@ -109,7 +113,6 @@ function updateEmployee() {
 
         console.log(res)
     })
-
 };
 
 function addEmployee() {
@@ -137,17 +140,31 @@ function addEmployee() {
         choices:[]
     }
     );
-
 };
 
-function addDepartment() {
+function addDepartment() { 
 
-};
+    inquirer.prompt([
+
+        {
+          name: "name",
+          type: "input",
+          message: "Enter the department name."
+        }
+
+    ]).then(function(res) {
+        connection.query( "INSERT INTO department SET ? ",{name: res.name},
+        
+        function(err) {if (err) throw err; console.table(res); beginningPrompt();})
+    })
+}
+
 
 function addRole() { 
     connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role",   
     function(err, res) {
       inquirer.prompt([
+
         {
             name: "title",
             type: "input",
@@ -164,26 +181,19 @@ function addRole() {
             type: "list",
             message: "Select the role's department id",
             choices: selectDepartment()
-        }
+        },
         
       ]).then(function(res) {
           connection.query("INSERT INTO role SET ?",
 
-            {
-                title: res.title,
-                salary: res.salary,
-                department_id: res.department
-            },
+        {
+            title: res.title,
+            salary: res.salary,
+            department_id: res.department
+        },
 
-            function(err) {
-                if (err) throw err
-                console.table(res);
-                beginningPrompt();
-            }
-        )
-  
-      });
-
+        function(err) { if (err) throw err; console.table(res); beginningPrompt(); })
+        });
     });
 };
 
@@ -191,11 +201,7 @@ var departmentArr = [''];
 function selectDepartment() {
   connection.query("SELECT * FROM department", function(err, res) {
     if (err) throw err
-    for (var i = 0; i < res.length; i++) {
-      departmentArr.push(res[i].id);
-    }
-    
-  })
+    for (var i = 0; i < res.length; i++) { departmentArr.push(res[i].id); }});
 
   return departmentArr;
 }
