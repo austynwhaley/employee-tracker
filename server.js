@@ -24,7 +24,7 @@ connection.connect(function(err) {
 
 function beginningPrompt() {
 
-    console.log('▁ ▂ ▄ ▅ ▆ ▇ █Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
+    console.log('▁ ▂ ▄ ▅ ▆ ▇ █！！Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
 
     inquirer.prompt({
 
@@ -33,43 +33,48 @@ function beginningPrompt() {
         message: "What would you like to do?",
         choices: [
 
-        "View all employees?", 
-        "View all employee's by role?",
-        "View all employee's by department?", 
-        "Update employee",
-        "Add employee?",
-        "Add role?",
-        "Add department?"
+        "View all employees", 
+        "View all roles",
+        "View all departments", 
+        "Update employee role",
+        "Update employee manager",
+        "Add employee",
+        "Add role",
+        "Add department"
     ]})
 
     .then( function (answer) {
         switch(answer.startMenu) {
 
-            case "View all employees?":
+            case "View all employees":
                 viewAllEmployees()
             break;
 
-            case "View all employee's by role?":
+            case "View all roles":
                 viewAllRoles() 
             break;
 
-            case "View all employee's by department?":
+            case "View all departments":
                 viewAllDepartments() 
             break;
 
-            case "Update employee":
-                updateEmployee();
+            case "Update employee role":
+                updateEmployeeRole();
             break;
 
-            case "Add employee?":
+            case "Update employee manager":
+                updateEmployeeManager();
+            break;
+
+            case "Add employee":
                 addEmployee()
             break;
 
-            case "Add role?":
+            case "Add role":
                 addRole();
             break;
 
-            case "Add department?":
+            case "Add department":
                 addDepartment()
             break;
 
@@ -97,15 +102,114 @@ function viewAllDepartments() {
     function(err, res) { if (err) throw err; console.table(res); beginningPrompt() })
 };
 
-function updateEmployee() {
-    connection.query("SELECT id, CONCAT (first_name, '', last_name) AS name FROM employee;",
 
-    function(err, res) { if (err) throw err; console.table(res); beginningPrompt() })
-};
+function updateEmployeeRole() {
+    connection.query("SELECT * FROM employee", function(err, res) {
+
+        let employeeList = [];
+
+        for (let i = 0; i < res.length; i++) { employeeList.push(res[i].id + " " + res[i].first_name + " " + res[i].last_name); }
+  
+      inquirer.prompt([
+
+        {
+            type: "list",
+            name: "employee",
+            message: "Which employee would you like to update?",
+            choices: employeeList
+        },
+        {
+            type: "list",
+            name: "newRole",
+            message: "Choose the new role for the employee.",
+            choices: selectRole()          
+        }
+
+        ])
+
+        .then(function(res) {
+
+         console.log("Updating...", res);
+          
+          const newId = {};
+
+          newId.employeeId = parseInt(res.employee.split(" ")[0]);
+
+          if      (res.newRole === "Quarterback") { newId.role_id = 1; }
+
+          else if (res.newRole === "Running Back") { newId.role_id = 2; }
+
+          else if (res.newRole === "Long Snapper") { newId.role_id = 3; }
+
+          else if (res.newRole === "Head Coach") { newId.role_id = 4; }
+
+          else if (res.newRole === "Assistant Coach") { newId.role_id = 5; }
+
+          else if (res.newRole === "Safety") { newId.role_id = 6; }
+
+          else if (res.newRole === "Lineman") { newId.role_id = 7; }
+
+          else if (res.newRole === "Kicker") { newId.role_id = 8; }
+
+          else {{ newId.role_id = null; }}
+
+          connection.query("UPDATE employee SET role_id = ? WHERE id = ?",
+
+            [newId.role_id, newId.employeeId],function(err, res) { viewAllEmployees(); beginningPrompt(); });
+
+        });
+    });
+  }
+
+  function updateEmployeeManager() {
+    connection.query("SELECT * FROM employee", function(err, res) {
+
+        let employeeList = [];
+
+        for (let i = 0; i < res.length; i++) { employeeList.push(res[i].id + " " + res[i].first_name + " " + res[i].last_name); }
+  
+      inquirer.prompt([
+
+        {
+            type: "list",
+            name: "employee",
+            message: "Which employee would you like to update?",
+            choices: employeeList
+        },
+        {
+            type: "list",
+            name: "newManager",
+            message: "Choose the new manager for the employee.",
+            choices: selectManager()          
+        }
+
+        ])
+
+        .then(function(res) {
+
+         console.log("Updating...", res);
+          
+          const newId = {};
+
+          newId.employeeId = parseInt(res.employee.split(" ")[0]);
+
+          if      (res.newManager === "Blaine Allan") { newId.manager_id = 1; }
+
+          else if (res.newManager === "Lester Friedman") { newId.manager_id = 2; }
+
+          else {{ newId.manager_id = null; }}
+
+          connection.query("UPDATE employee SET manager_id = ? WHERE id = ?",
+
+            [newId.manager_id, newId.employeeId],function(err, res) { viewAllEmployees(); beginningPrompt(); });
+
+        });
+    });
+  }
 
 
-function addEmployee() {
-    inquirer.prompt(
+  function addEmployee() {
+    inquirer.prompt([
     {
         name:"firstName",
         type:"input",
@@ -116,33 +220,20 @@ function addEmployee() {
         type:"input",
         message:"What is the employee's last name?"
     },
-    {
-        name:"role",
-        type:"list",
-        message:"What is the employee's role?",
-        choices:selectRole()
-    },
-    {
-        name:"manager",
-        type:"list",
-        message:"Who is the employee's manager?",
-        choices: selectManager()
-    }
-    ).then(function(res) {
-        
-        connection.query("INSERT INTO role SET ?",
-
-      {
-        first_name: res.firstName,
-        last_name: res.lastName,
-        manager_id: res.manager,
-        role_id: res.role
-      },
-
-      function(err) { if (err) throw err; console.table(res); beginningPrompt(); })
-
-    });
-};
+    ])
+      .then(function(res) {
+        connection.query(
+          "INSERT INTO employee SET ?",
+        {
+            first_name: res.firstName,
+            last_name: res.lastName,
+            role_id: null,
+            manager_id: null
+        },
+          function(err) {if (err) throw err; console.table(res); beginningPrompt();})
+      });
+  }
+  
 
 function addDepartment() { 
 
@@ -209,16 +300,17 @@ function selectDepartmentId() {
   return departmentId;
 }
 
-var manager = [];
+var manager = [''];
 function selectManager() {
   connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
 
-    if (err) throw err; for (var i = 0; i < res.length; i++) {manager.push(res[i].first_name);}})
+    if (err) throw err; for (var i = 0; i < res.length; i++) { manager.push(res[i].first_name + " " + res[i].last_name); }})
+
 
     return manager;
 }
 
-var role = [];
+var role = [''];
 function selectRole() {
   connection.query("SELECT * FROM role", function(err, res) {
 
