@@ -6,7 +6,7 @@ Copyright (c) [2020] [Austyn Whaley]
 
 ---
 
-![Screenshot](./trackerGif.gif)
+![Screenshot](./assets/images/emptrakSS.png)
 
 ### Table of Contents
 
