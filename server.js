@@ -24,7 +24,7 @@ connection.connect(function(err) {
 
 function beginningPrompt() {
 
-    console.log('▁ ▂ ▄ ▅ ▆ ▇ █！！Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
+    console.log('▁ ▂ ▄ ▅ ▆ ▇ █！！Ｅｍｐｌｏｙｅｅ　Ｍａｎａｇｅｒ ！！█ ▇ ▆ ▅ ▄ ▂ ▁')
 
     inquirer.prompt({
 
@@ -139,7 +139,7 @@ function updateEmployeeRole() {
 
           else if (res.newRole === "Running Back") { newId.role_id = 2; }
 
-          else if (res.newRole === "Long Snapper") { newId.role_id = 3; }
+          else if (res.newRole === "Punter") { newId.role_id = 3; }
 
           else if (res.newRole === "Head Coach") { newId.role_id = 4; }
 
@@ -297,7 +297,7 @@ function selectDepartmentId() {
 
     if (err) throw err; for (var i = 0; i < res.length; i++) { department.push(res[i].id); }});
 
-  return departmentId;
+  return department;
 }
 
 var manager = [''];
